@@ -50,26 +50,48 @@ def finders_md5():
 
 
 
-def finders_alias():
-    tsv_file = open("filereport_read_run_PRJEB24932_tsv.txt")
-    read_tsv = csv.reader(tsv_file, delimiter="\t")
+# def finders_alias():
+#     tsv_file = open("filereport_read_run_PRJEB24932_tsv.txt")
+#     read_tsv = csv.reader(tsv_file, delimiter="\t")
+#     finder=False
+#     i=0
+#     for row in read_tsv:
+#         if not finder:
+#             while not finder and i<len(row):
+#                 if row[i] == "sample_alias":
+#                     finder = True
+#                     return i
+#                 else:
+#                     i+=1
+#         else:
+#             None
+          
+#         if not finder:
+#             raise Exception('Pas de champ sample_alias')
+#     tsv_file.close()
+#     return
+
+
+
+def finders_alias(fichierTsv,fichier):
+    f=open(fichierTsv)
+    tsv_toListe = [ i.strip().split('\t') for i in f]
     finder=False
     i=0
-    for row in read_tsv:
+    for row in tsv_toListe:
         if not finder:
-            while not finder and i<len(row):
-                if row[i] == "sample_alias":
-                    finder = True
+            while not finder and  i<len(row):
+                if row[i]=="sample_alias":
+                    finder=True
+                   # print("trouvé", i )
                     return i
                 else:
                     i+=1
         else:
             None
-          
         if not finder:
-            raise Exception('Pas de champ sample_alias')
-    tsv_file.close()
-    return
+            raise Exception("pas de champs sample_alias")
+    return i
 
 def count_correct(s):
     r= open(s)
