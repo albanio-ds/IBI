@@ -1,6 +1,6 @@
 
 
-#PRESENTATION 
+# PRESENTATION 
 Objectif : Construire un Pipeline pour des experts en biologie. (à détailler)
 
 # EQUIPE
