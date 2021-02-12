@@ -142,7 +142,7 @@ def telecharge(lien,md5_value):
         if(md5_value == parseMd5_recup[0]):
             print("TAR :" +  lien_targz[-1] + " téléchargement fini..")
             estDl=True
-        if tentative ==5 :
+        if tentative ==2 :
             delete=lien_targz[-1]
             askUser = input("Voulez-vous tous supprimer ? (y/n) ")
             if askUser.lower()=="y":
