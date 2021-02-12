@@ -2,16 +2,14 @@
 
 import os
 import subprocess
+import signal
  
 
 
-genome_de_reference ="S288C_reference_sequence_R64-2-1_20150113.fsa"
 
-#read1="ERR2299966_1.fastq"
-#read2="ERR2299966_2"
-#nv_noms=read1+"_"+read2
-#bwa index  S288C_reference_sequence_R64-2-1_20150113.fsa
-#bwa mem genome_de_reference read1.fastq read2.fastq >  nv_noms
+genome_de_reference ="S288C_reference_sequence_R64-2-1_20150113.fsa" # a changer 
+path_gatk_java ="java -jar /home/jeyanthan/Documents/coursL3/S6/IBI/Gatk/gatk-4.1.9.0/gatk-package-4.1.9.0-local.jar" # achanger 
+fichierTsv = "filereport_read_run_PRJEB24932_tsv.txt" # a changer 
 
 
 #Les reads sont au format fastq qui a comme extension soit .fastq soit .fq. Ils peuvent etre utilisés compressés (pas de pb).
@@ -167,13 +165,141 @@ def finderSampleName(fichierTsv, searchSampleN):
         raise Exception("Sample name introuvable")
     
 
+def strainFinder(monGdeRef):
+    f= open(monGdeRef)
+    fsaToList =[i.strip().split('[') for i in f]
+    firstLigne =fsaToList[0]
+    strainRet=""
+    for i in firstLigne : 
+        if "strain=" in i :
+            strainRet = i.split("=")[1][:-2].strip()
+           # print("mon strain :" ,strainRet)
+            return strainRet
+    
+    if strainRet=="":
+        raise Exception("No strain found")
+
+
+def checkNewFile(f):
+    affiche_ls = str(subprocess.check_output("ls" ,shell=True))
+    affiche_ls=affiche_ls.split("\\n")
+    if(f in affiche_ls):
+        return True
+    
+    return False
+
+def mapping_samtool(FindSampleName,newName_Sam,fichierTsv):
+    sampleName= finderSampleName(fichierTsv,FindSampleName)
+    newName_Bam= sampleName + ".bam"
+    newName_BamSort = sampleName + "_sort.bam"
+    newName_BamDupl = sampleName + "_duplicated.bam"
+    newName_BamFlag = sampleName + "_flag.txt"
+    #on passe à samtools
+    samtool_view=False
+    samtool_sort=False
+    gatk_markDupl =False
+    samtool_flags=False
+    if checkNewFile(newName_Bam):
+        print(newName_Bam, " is already there! ")
+        samtool_view=True
+        
+    if not checkNewFile(newName_Bam):
+        #samtools view -o aln.bam aln.sam.gz
+        os.system("samtools " + "view " + "-o " + newName_Bam + " " + newName_Sam  )
+        if checkNewFile(newName_Sam):
+            samtool_view=True
+    if samtool_view : 
+        #on passe à samtools sort
+        if checkNewFile(newName_BamSort):
+            print(newName_BamSort, " is already there! ")
+            samtool_sort=True
+        else:
+            os.system("samtools " + "view " + "-o " + newName_BamSort + " " + newName_Bam  )
+            if checkNewFile(newName_BamSort):
+                samtool_sort=True
+    if samtool_sort:
+        #on passe a GATK
+        
+        if checkNewFile(newName_BamDupl):
+            print(newName_BamDupl, " is already there! ")
+            gatk_markDupl=True
+        else:
+            #gatk MarkDuplicatesSpark  -I input.bam -O marked_duplicated.bam 
+           
+            gatk_cmd_bis=" MarkDuplicatesSpark " + "-I " + newName_BamSort + " " +"-O " + newName_BamDupl 
+          
+            os.system(path_gatk_java + gatk_cmd_bis)
+
+          
+            if checkNewFile(newName_BamDupl):
+                gatk_markDupl=True
+    if gatk_markDupl:
+        #samtools flagstat aln.sorted.bam
+        if checkNewFile(newName_BamFlag):
+            print(newName_BamFlag, " is already there! ")
+            samtool_flags=True
+        else:
+            os.system("samtools " + "flagstat " + newName_BamDupl + " >" + newName_BamFlag )
+            if checkNewFile(newName_BamFlag):
+                samtool_flags=True
+        return
+
+    
+
+        
+
+
+
+
+
 def mappingPaired(fichierTsv,genoRef,f1,f2):
-    newName= finderSampleName(fichierTsv,f1) + ".sam"
-    print("bwa "+ "mem " +genoRef + " " + f1 + " " + f2 + " >" + newName)
+    sampleName= finderSampleName(fichierTsv,f1)
+    newName_Sam= sampleName + ".sam"
+    strainName = strainFinder(genoRef)
+    #print("bwa "+ "mem " +genoRef + " " + f1 + " " + f2 + " >" + newName)
+    rg_id = strainName+"-"+sampleName
+    rg_sm = sampleName
+    rg_flag = repr("@RG\tID:"+ rg_id +"\tSM:" + rg_sm + "\tPL:Illumina\tPU:0\tLB:1")
+    bwa_map =False
+    samtool_map=False
+    if checkNewFile(newName_Sam) : 
+        print(newName_Sam, " is already there! ")
+        bwa_map = True
+    if not checkNewFile(newName_Sam) : 
+        #print("bwa "+ "mem " +"-R " + rg_flag+ " " +genoRef +" " +  f1 + " " + f2 + " >" + newName)
+        os.system("bwa "+ "mem " +"-R " + rg_flag+ " " +genoRef +" " +  f1 + " " + f2 + " >" + newName_Sam)
+        if checkNewFile(newName_Sam) :
+            print("new file : ", newName_Sam) 
+            bwa_map = True
+    
+    if bwa_map :
+        mapping_samtool(f1,newName_Sam,fichierTsv)
 
+    
+ 
 
-def mappingSingle(genoRef,f):
-     print("bwa "+ "mem " +genoRef + " " + f1 + " >" + "nvNom")
+def mappingSingle(fichierTsv,genoRef,f):
+    sampleName= finderSampleName(fichierTsv,f)
+    newName_Sam= sampleName + ".sam"
+    strainName = strainFinder(genoRef)
+    rg_id = strainName+"-"+sampleName
+    rg_sm = sampleName
+    rg_flag = repr("@RG\tID:"+ rg_id +"\tSM:" + rg_sm + "\tPL:Illumina\tPU:0\tLB:1")
+    bwa_map = False
+    samtool_map=False
+    if checkNewFile(newName_Sam) : 
+        print(newName_Sam, " is already there! ")
+        bwa_map= True
+    if not checkNewFile(newName_Sam) :
+        #print("bwa "+ "mem " +"-R " + rg_flag+ " " +genoRef +" " +  f + " >" + newName)
+        os.system("bwa "+ "mem " +"-R " + rg_flag+ " " +genoRef +" " +  f + " >" + newName_Sam)
+        if checkNewFile(newName_Sam):
+            print("new file : ", newName_Sam)
+            bwa_map=True
+    if bwa_map : 
+        mapping_samtool(f,newName_Sam,fichierTsv)
+        
+    
 
 def pipeline(fichierTsv, monGdeRef):
     readPairEnd=getPaireEnd()
@@ -197,11 +323,11 @@ def pipeline(fichierTsv, monGdeRef):
     
     for k in readSinglEnd:
         compteur+=1
-        print(k,":", compteur)
+        mappingSingle(fichierTsv,monGdeRef,k)
+      #  print(k,":", compteur)
 
 
-pipeline("filereport_read_run_PRJEB24932_tsv.txt","S288C_reference_sequence_R64-2-1_20150113.fsa")
 
-#finders_alias("filereport_read_run_PRJEB24932_tsv.txt", "toto")
+ 
 
-#finderSampleName("filereport_read_run_PRJEB24932_tsv.txt", "ERR2299966_1.fastq")
+pipeline(fichierTsv,genome_de_reference)
