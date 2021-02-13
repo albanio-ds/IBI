@@ -5,12 +5,22 @@ import subprocess
 import signal
  
 
+'''
+Prérequis
+Unzip les fichiers .gz avant de commencer cette étape
+modifier les variables ci-dessous marqué à coté "a changer" avec les noms de fichiers respectifs
+
+genome_de_reference : par le fichiers contenant le genome de référence (.fasta ou .fsa)
+path_gatk_java : par le nom du chemin vers le jar local gatk
+fichierTsv : par le fichier tsv qui contient les informations liés au lien ftp,md5 et sample_alias
+             (que vous avez utilisé dans l'etape précédente)
+
+'''
 
 
 genome_de_reference ="S288C_reference_sequence_R64-2-1_20150113.fsa" # a changer 
-path_gatk_java ="java -jar /home/jeyanthan/Documents/coursL3/S6/IBI/Gatk/gatk-4.1.9.0/gatk-package-4.1.9.0-local.jar" # achanger 
+path_gatk_java ="java -jar /home/jeyanthan/Documents/coursL3/S6/IBI/Gatk/gatk-4.1.9.0/gatk-package-4.1.9.0-local.jar" # a changer 
 fichierTsv = "filereport_read_run_PRJEB24932_tsv.txt" # a changer 
-
 
 #Les reads sont au format fastq qui a comme extension soit .fastq soit .fq. Ils peuvent etre utilisés compressés (pas de pb).
 

@@ -3,77 +3,59 @@
 
 import os
 import subprocess
-import csv
+ 
 
+fichierTsv ="filereport_read_run_PRJEB24932_tsv.txt"
 
-def finder_ftp():
-    tsv_file = open("filereport_read_run_PRJEB24932_tsv.txt")
-    read_tsv = csv.reader(tsv_file, delimiter="\t")
+#fastq_ftp finder
+def finder_ftp(fichierTsv):
+    f=open(fichierTsv)
+    tsv_toListe = [ i.strip().split('\t') for i in f]
     finder=False
     i=0
-    for row in read_tsv:
+    for row in tsv_toListe:
         if not finder:
-            while not finder and i<len(row):
-                if row[i] == "fastq_ftp":
-                    finder = True
-                else:
-                    i+=1
-        else:
-            None
-         
-        if not finder:
-            raise Exception('Pas de champ fastq_ftp')
-    tsv_file.close()
-    return i
-
-def finders_md5():
-    tsv_file = open("filereport_read_run_PRJEB24932_tsv.txt")
-    read_tsv = csv.reader(tsv_file, delimiter="\t")
-    finder=False
-    i=0
-    for row in read_tsv:
-        if not finder:
-            while not finder and i<len(row):
-                if row[i] == "fastq_md5":
-                    finder = True
+            while not finder and  i<len(row):
+                if row[i]=="fastq_ftp":
+                    finder=True
+                   # print("trouvé", i )
                     return i
                 else:
                     i+=1
         else:
             None
-           # print(i)
-           # print(row[i]+"\n")
         if not finder:
-            raise Exception('Pas de champ fastq_md5')
-    tsv_file.close()
-    return
+            raise Exception("pas de champs fast_ftp")
+    return i
+
+#fastq_md5 finder
+def finders_md5(fichierTsv):
+    f=open(fichierTsv)
+    tsv_toListe = [ i.strip().split('\t') for i in f]
+    finder=False
+    i=0
+    for row in tsv_toListe:
+        if not finder:
+            while not finder and  i<len(row):
+                if row[i]=="fastq_md5":
+                    finder=True
+                   # print("trouvé", i )
+                    return i
+                else:
+                    i+=1
+        else:
+            None
+        if not finder:
+            raise Exception("pas de champs fastq_md5")
+    return i
 
 
 
-# def finders_alias():
-#     tsv_file = open("filereport_read_run_PRJEB24932_tsv.txt")
-#     read_tsv = csv.reader(tsv_file, delimiter="\t")
-#     finder=False
-#     i=0
-#     for row in read_tsv:
-#         if not finder:
-#             while not finder and i<len(row):
-#                 if row[i] == "sample_alias":
-#                     finder = True
-#                     return i
-#                 else:
-#                     i+=1
-#         else:
-#             None
-          
-#         if not finder:
-#             raise Exception('Pas de champ sample_alias')
-#     tsv_file.close()
-#     return
 
 
 
-def finders_alias(fichierTsv,fichier):
+
+def finders_alias(fichierTsv):
     f=open(fichierTsv)
     tsv_toListe = [ i.strip().split('\t') for i in f]
     finder=False
@@ -93,11 +75,11 @@ def finders_alias(fichierTsv,fichier):
             raise Exception("pas de champs sample_alias")
     return i
 
-def count_correct(s):
-    r= open(s)
+def count_correct(fichierTsv):
+    r= open(fichierTsv)
     tsv_toListe = [ i.strip().split('\t') for i in r]
     compteur=0
-    md5_f=finders_md5()
+    md5_f=finders_md5(fichierTsv)
     for i in tsv_toListe:
        # if len(i)>6:  #première liste= premiere ligne , nous interèsse pas
         if len(i[md5_f])>=32 and (len(i[md5_f].split(";"))>=2 ):
@@ -121,7 +103,7 @@ def telecharge(lien,md5_value):
 
     Fonctionnalité: 
         -Si l'utilisateur décide d'arrêter le téléchargement par exemple si sa connexion est insuffisante
-        alors il peut faire ctrl+c 5 fois et il aura le choix entre supprimer tous les fichiers crées ou bien
+        alors il peut faire ctrl+c 1 fois et il aura le choix entre supprimer tous les fichiers crées ou bien
         simplement le derniers
 
 
@@ -143,25 +125,12 @@ def telecharge(lien,md5_value):
             print("TAR :" +  lien_targz[-1] + " téléchargement fini..")
             estDl=True
         if tentative ==2 :
-            delete=lien_targz[-1]
-            askUser = input("Voulez-vous tous supprimer ? (y/n) ")
-            if askUser.lower()=="y":
-                delete =  lien_targz[-1]+"*"
-                os.system("rm "+  delete )
-                print("\n OK tout les fichiers téléchargés sont effacé ! ")
-                raise Exception('Téléchargement annulé !')
-                return
-            if askUser.lower()=="n":
-                #delete =  lien_targz[-1]+"*"
-                #os.system("rm "+  delete )
-                #print("\n OK tout les fichiers téléchargés sont effacé ! ")
-                raise Exception('Téléchargement annulé !')
-                return
-            else:
-                os.system("rm "+  delete )
-                print("\n OK fichier effacé ! ")
-                raise Exception('Téléchargement annulé !')
-                return
+            delete =  lien_targz[-1]+"*"
+            os.system("rm "+  delete )
+            print("\n OK tout les fichiers téléchargés sont effacé ! ")
+            raise Exception('Téléchargement annulé !')
+            return
+            
     
       
 
@@ -190,9 +159,9 @@ Pas d'inquiètude les fichiers sont supprimés automatiquements.
     tsv_toListe = [ i.strip().split('\t') for i in f]
     compteur=0
     total = count_correct(s)
-    ftp_f= finder_ftp()
-    md5_f=finders_md5()
-    alias_f =finders_alias()
+    ftp_f= finder_ftp(s)
+    md5_f=finders_md5(s)
+    alias_f =finders_alias(s)
     #autre
     for i in tsv_toListe:
         estDl=False
@@ -258,4 +227,4 @@ Pas d'inquiètude les fichiers sont supprimés automatiquements.
 
 
 
-pipeline_one("filereport_read_run_PRJEB24932_tsv.txt")
+pipeline_one(fichierTsv)
