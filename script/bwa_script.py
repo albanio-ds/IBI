@@ -2,7 +2,7 @@
 
 import os
 import subprocess
-import signal
+from statistics import mean
  
 
 '''
@@ -252,8 +252,32 @@ def mapping_samtool(FindSampleName,newName_Sam,fichierTsv):
             os.system("samtools " + "flagstat " + newName_BamDupl + " >" + newName_BamFlag )
             if checkNewFile(newName_BamFlag):
                 samtool_flags=True
-        return
 
+    return
+
+    
+def  mappingCalcul():
+    affiche_ls = str(subprocess.check_output("ls" ,shell=True))
+    affiche_ls=affiche_ls.split("\\n")
+    pourcentage=[]
+    lemin =0
+    lemax=0
+    lamoyenne=0
+    for i in range(len(affiche_ls)-1):
+        fichier=affiche_ls[i].split("_")
+        if len(fichier)==2:
+            if fichier[1]=="flag.txt":
+                file_name ="_".join(fichier)
+                map_file = open(file_name)
+                map_file_toList =[ i.strip().split('\t') for i in map_file] 
+                mapped_here= map_file_toList[4][0].split("%")
+                mapped_here = mapped_here[0].split("(")
+                pourcentage.append(float(mapped_here[1]))
+           
+    lemin =max(pourcentage)
+    lemax=min(pourcentage)
+    lamoyenne=round(mean(pourcentage))
+    print("la moyenne =", lamoyenne  ,"le min = ", lemin , " le max = ", lemax )
     
 
         
@@ -311,6 +335,7 @@ def mappingSingle(fichierTsv,genoRef,f):
         
     
 
+
 def pipeline(fichierTsv, monGdeRef):
     readPairEnd=getPaireEnd()
     readSinglEnd=getSingleEnd()
@@ -323,21 +348,17 @@ def pipeline(fichierTsv, monGdeRef):
     for i in readPairEnd:
         if i!=[]:
             compteur+=2
-          #  print(i," :",compteur)
             read1_pair=i[0]
             read2_pair=i[1]
-            #print("paire1 :",read1_pair, " paire2 :", read2_pair)
             mappingPaired(fichierTsv,monGdeRef,read1_pair,read2_pair)
-            #for j in i :
-             #   print(" read ",j )
     
     for k in readSinglEnd:
         compteur+=1
         mappingSingle(fichierTsv,monGdeRef,k)
-      #  print(k,":", compteur)
 
 
 
  
 
-pipeline(fichierTsv,genome_de_reference)
+#pipeline(fichierTsv,genome_de_reference)
+mappingCalcul()
