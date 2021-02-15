@@ -27,13 +27,12 @@ fichierTsv = "filereport_read_run_PRJEB24932_tsv.txt" # a changer
 def getPaireEnd():
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
     affiche_ls=affiche_ls.split("\\n")
-    
-  
     groupe_paire=[[]]
     for i in range(len(affiche_ls)-1):
         read1=affiche_ls[i].split(".")
         read2= affiche_ls[i+1].split(".")
         if len(read1)==2 and  len(read2)==2 :
+             #condition fast,fq
             if (read1[1]=="fastq" and read2[1]=="fastq")or (read1[1]=="fq" and read2[1]=="fq"):
                 if read1[0]!=read2[0] and read1[0][:-1] ==read2[0][:-1]  and read1[0][-2]=='_':
                     read1_complet=read1[0]+"."+read1[1]
@@ -41,6 +40,7 @@ def getPaireEnd():
                     groupe_paire.append([read1_complet,read2_complet])
 
     return groupe_paire
+
 
 
 def checkSingleEnd(myRead):
@@ -52,8 +52,7 @@ def checkSingleEnd(myRead):
                 p+=1
     return p
                
-                
-
+#ex : ERR43242_1.fastq
 def getSingleEnd():
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
     affiche_ls=affiche_ls.split("\\n")
@@ -84,8 +83,6 @@ def genReferenceIndexed(s):
     genomeF5= s+"."+"sa" 
 
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
-    affiche_ls=affiche_ls.split("\\n")
-    #for i in range(len(affiche_ls)):
     if genomeF1 in  affiche_ls and genomeF2 in  affiche_ls and genomeF3 in  affiche_ls and genomeF4 in  affiche_ls and genomeF5 in  affiche_ls:
         return True
     
@@ -169,6 +166,7 @@ def finderSampleName(fichierTsv, searchSampleN):
         if lienfinale ==correctName:
            # print(lienf[0], "son sample name = ", i[sample_column])
             sample_name= i[sample_column]
+            #print(sample_name)
             return sample_name
 
     if sample_name =="":
@@ -192,7 +190,6 @@ def strainFinder(monGdeRef):
 
 def checkNewFile(f):
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
-    affiche_ls=affiche_ls.split("\\n")
     if(f in affiche_ls):
         return True
     
@@ -204,11 +201,13 @@ def mapping_samtool(FindSampleName,newName_Sam,fichierTsv):
     newName_BamSort = sampleName + "_sort.bam"
     newName_BamDupl = sampleName + "_duplicated.bam"
     newName_BamFlag = sampleName + "_flag.txt"
+    newName_BamCouv = sampleName + "_couv.txt"
     #on passe à samtools
     samtool_view=False
     samtool_sort=False
     gatk_markDupl =False
     samtool_flags=False
+    bedtools_couv=False
     if checkNewFile(newName_Bam):
         print(newName_Bam, " is already there! ")
         samtool_view=True
@@ -252,8 +251,18 @@ def mapping_samtool(FindSampleName,newName_Sam,fichierTsv):
             os.system("samtools " + "flagstat " + newName_BamDupl + " >" + newName_BamFlag )
             if checkNewFile(newName_BamFlag):
                 samtool_flags=True
+    if samtool_flags:
+        if checkNewFile(newName_BamCouv):
+            print(newName_BamCouv, " is already there! ")
+            bedtools_couv=True
+        else:
+            os.system("bedtools " + "genomecov " + "-ibam " +  newName_BamDupl  + " -bga" + " > " + newName_BamCouv )
+            if checkNewFile(newName_BamFlag):
+                samtool_flags=True
+
 
     return
+        #bedtools genomecov -ibam    fichier_duplicate.bam  -bga  >   sampleAlis_couv.txt
 
     
 def  mappingCalcul():
@@ -274,14 +283,42 @@ def  mappingCalcul():
                 mapped_here = mapped_here[0].split("(")
                 pourcentage.append(float(mapped_here[1]))
            
-    lemin =max(pourcentage)
-    lemax=min(pourcentage)
+    lemin =min(pourcentage)
+    lemax=max(pourcentage)
     lamoyenne=round(mean(pourcentage))
     print("la moyenne =", lamoyenne  ,"le min = ", lemin , " le max = ", lemax )
     
 
         
 
+def couvertureMapp():
+    affiche_ls = str(subprocess.check_output("ls" ,shell=True))
+    affiche_ls=affiche_ls.split("\\n")
+    moyTab=[]
+    lamoyenneToTal=0
+    leMin=0
+    leMax=0
+    for i in range(len(affiche_ls)-1):
+        fichier=affiche_ls[i].split("_")
+        if len(fichier)==2:
+            if fichier[1]=="couv.txt":
+                #print(fichier)
+                file_name ="_".join(fichier)
+                map_file = open(file_name)
+                fileToList = [ i.strip().split('\t') for i in map_file] 
+                res=0
+                taille=0
+                for i in range(len(fileToList)):
+                    res+=int(fileToList[i][3])
+                    taille+=1
+                moy=res/taille
+                moyTab.append(moy)
+
+
+    leMin =min(moyTab)
+    leMax=max(moyTab)
+    lamoyenneToTal=round(mean(moyTab))
+    print("la moyenne =", lamoyenneToTal  ,"le min = ", leMin , " le max = ", leMax )
 
 
 
@@ -296,7 +333,9 @@ def mappingPaired(fichierTsv,genoRef,f1,f2):
     rg_flag = repr("@RG\tID:"+ rg_id +"\tSM:" + rg_sm + "\tPL:Illumina\tPU:0\tLB:1")
     bwa_map =False
     samtool_map=False
+    #print(newName_Sam)
     if checkNewFile(newName_Sam) : 
+        
         print(newName_Sam, " is already there! ")
         bwa_map = True
     if not checkNewFile(newName_Sam) : 
@@ -341,10 +380,10 @@ def pipeline(fichierTsv, monGdeRef):
     readSinglEnd=getSingleEnd()
     compteur=0
     if genReferenceIndexed(monGdeRef):
-        print("le genome de réference à bien étais indexé !")
+        print("Le genome de réference a bien été indexé !")
     else:
         indexGenome(monGdeRef)
-    print("Debut du mapping !")
+    print("Début du mapping !")
     for i in readPairEnd:
         if i!=[]:
             compteur+=2
@@ -358,7 +397,14 @@ def pipeline(fichierTsv, monGdeRef):
 
 
 
+    
  
-
+##############
 #pipeline(fichierTsv,genome_de_reference)
+
 mappingCalcul()
+#################
+
+
+##### 
+#couvertureMapp()
