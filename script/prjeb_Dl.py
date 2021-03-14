@@ -5,10 +5,21 @@ import os
 import subprocess
  
 
-fichierTsv ="filereport_read_run_PRJEB24932_tsv.txt"
+fichierTsv ="filereport_read_run_PRJEB24932_tsv.txt"  # à changer
 
 #fastq_ftp finder
 def finder_ftp(fichierTsv):
+    ''' 
+    paramètre: fichier tsv contenant les liens des échantillons à
+    télécharger
+
+    sortie: renvoye le numéro de la colonne contenant le champs
+    'fastq_ftp'. (entier)
+    En cas d'erreur une exception est levée.
+
+    remarque: 'fastq_ftp' est une colonne requise.
+
+    '''
     f=open(fichierTsv)
     tsv_toListe = [ i.strip().split('\t') for i in f]
     finder=False
@@ -30,6 +41,17 @@ def finder_ftp(fichierTsv):
 
 #fastq_md5 finder
 def finders_md5(fichierTsv):
+      ''' 
+    paramètre: fichier tsv contenant les liens des échantillons à
+    télécharger
+
+    sortie: renvoye le numéro de la colonne contenant le champs
+    'fastq_md5'. (entier)
+    En cas d'erreur une exception est levée.
+
+    remarque: 'fastq_md5' est une colonne requise.
+
+    '''
     f=open(fichierTsv)
     tsv_toListe = [ i.strip().split('\t') for i in f]
     finder=False
@@ -56,6 +78,18 @@ def finders_md5(fichierTsv):
 
 
 def finders_alias(fichierTsv):
+      ''' 
+    paramètre: fichier tsv contenant les liens des échantillons à
+    télécharger
+
+    sortie: renvoye le numéro de la colonne contenant 
+    le champs'sample_alias'. (entier)
+
+    En cas d'erreur une exception est levée.
+
+    remarque: 'sample_alias' est une colonne requise.
+
+    '''
     f=open(fichierTsv)
     tsv_toListe = [ i.strip().split('\t') for i in f]
     finder=False
@@ -76,16 +110,25 @@ def finders_alias(fichierTsv):
     return i
 
 def count_correct(fichierTsv):
+       ''' 
+    paramètre: fichier tsv contenant les liens des échantillons à
+    télécharger
+
+    sortie: renvoye le nombre de lien à télécharger (entier)
+
+   
+
+    '''
+
     r= open(fichierTsv)
     tsv_toListe = [ i.strip().split('\t') for i in r]
     compteur=0
     md5_f=finders_md5(fichierTsv)
     for i in tsv_toListe:
-       # if len(i)>6:  #première liste= premiere ligne , nous interèsse pas
-        if len(i[md5_f])>=32 and (len(i[md5_f].split(";"))>=2 ):
+        if len(i[md5_f])>=32 and (len(i[md5_f].split(";"))>=2 ): #deux liens 
             compteur+=2
         else:
-            if len(i[md5_f])>=32:
+            if len(i[md5_f])>=32: # un lien
                 compteur+=1
 
 
@@ -96,15 +139,18 @@ def count_correct(fichierTsv):
 
 def telecharge(lien,md5_value):
     """
-    Cette fonction s'occupe du téléchargement des fichiers et garantie leurs source à l'aide 
+    Cette fonction s'occupe du téléchargement des fichiers et garantie leurs origine à l'aide 
     des vérifications md5.
 
-   
+    paramètre:  liengz , md5 associé au lien
+
+    sortie: télécharge le lien gz demandé et verifie le md5   
 
     Fonctionnalité: 
-        -Si l'utilisateur décide d'arrêter le téléchargement par exemple si sa connexion est insuffisante
-        alors il peut faire ctrl+c 1 fois et il aura le choix entre supprimer tous les fichiers crées ou bien
-        simplement le derniers
+        -Si l'utilisateur décide d'arrêter le téléchargement par exemple si ça connexion est insuffisante
+        alors il peut faire ctrl+c 2 fois et seul le liens en cours de téléchargement est supprimé.
+
+
 
 
 
@@ -147,12 +193,18 @@ Donner le nom du fichier "tsv" comme une chaine de caractère ex : pipeline_one(
 Puis dans le Terminale : python3 prjeb_Dl.py
 
 J'ai convertit le fichier tsv en une liste est je parcours seulements les éléments qui m'interessent à savoir les liens ftp et leurs  md5 !
+
+
+Fonctionnalité: 
+On a pensé au confort utilisateur et lui permettre de télécharger les échantillons quand il le souhaite de plus 
+en cas de mauvaise connexion, ce  script est très pratique en effet un compteur et une vérification permet 
+d'assurer qu'on ne télécharge pas le même fichier en cas de relance de script.
+
 Biblio:
 *os pour faire mes appels sys comme wget ou rm.
 *subprocess pour recupérer certains resultat d'appels sys , comme md5sum ou encore ls
 
-Au bout de 5 tentatives de téléchargement  d'un même fichier, le script s'arrête => connexion trop mauvaise ou ctr+c  5 fois !
-Pas d'inquiètude les fichiers sont supprimés automatiquements.
+
 
     """
     f=open(s)
@@ -166,7 +218,6 @@ Pas d'inquiètude les fichiers sont supprimés automatiquements.
     for i in tsv_toListe:
         estDl=False
         tentative=0
-       # if len(i)>4:  #première liste= premiere ligne , nous interèsse pas
         if len(i[md5_f])>=32 and (len(i[md5_f].split(";"))>=2 ):  #contient md5 donc contient aussi un lien / 2 liens
             compteur+=1
             estDl=False
@@ -227,4 +278,4 @@ Pas d'inquiètude les fichiers sont supprimés automatiquements.
 
 
 
-#pipeline_one(fichierTsv)
+pipeline_one(fichierTsv)
