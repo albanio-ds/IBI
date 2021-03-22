@@ -282,7 +282,7 @@ def mapping_samtool(FindSampleName,newName_Sam,fichierTsv,genoRef):
             print(newName_BamSort, " is already there! ")
             samtool_sort=True
         else:
-            os.system("samtools " + "view " + "-o " + newName_BamSort + " " + newName_Bam  )
+            os.system("samtools " + "sort " + "-o " + newName_BamSort + " " + newName_Bam  )
             if checkNewFile(newName_BamSort):
                 samtool_sort=True
     if samtool_sort:
