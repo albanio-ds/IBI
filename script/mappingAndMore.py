@@ -18,7 +18,7 @@ fichierTsv : par le fichier tsv qui contient les informations liés au lien ftp,
 '''
 
 
-genome_de_reference_fsa ="S288C_reference_sequence_R64-2-1_20150113.fsa" # a changer
+genome_de_reference_fsa ="S288C_reference_sequence_R64-2-1_20150113.fasta" # a changer
 path_gatk_java ="java -jar /home/jeyanthan/Documents/coursL3/S6/IBI/Gatk/gatk-4.1.9.0/gatk-package-4.1.9.0-local.jar" # a changer
 fichierTsv = "filereport_read_run_PRJEB24932_tsv.txt" # a changer
 
@@ -26,6 +26,13 @@ fichierTsv = "filereport_read_run_PRJEB24932_tsv.txt" # a changer
 
 def getPaireEnd():
     '''
+    Cette fonction verifie si deux fichiers appartiennent à un
+    même échantillons et permet de récupérer les paire end du 
+    répertoire courant. 
+
+    @paramètre: N/A
+
+    @sortie: (liste) contenant les pairs end
 
     '''
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
@@ -48,6 +55,12 @@ def getPaireEnd():
 
 def checkSingleEnd(myRead):
     '''
+    Cette fonction permet de vérifier si un read est bien 
+    un single end
+    @paramètre: (string) un read
+
+    @sortie: (entier) valant 0 si c'est un single end sinon il s'agit d'un paire
+    end
 
     '''
     p=0
@@ -61,6 +74,11 @@ def checkSingleEnd(myRead):
 #ex : ERR43242_1.fastq
 def getSingleEnd():
     '''
+    cette fonction permet de récupérer l'ensemble des single end dans le répertoire courant.
+
+    @paramètre: N/A
+
+    @sortie: (liste) contenant les singles end
 
     '''
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
@@ -89,6 +107,12 @@ def getSingleEnd():
 
 def genReferenceIndexed(s):
     '''
+    cette fonction va vérifier si le 
+    génôme de réference est bien indéxé.
+
+    @paramètre: (string) le nom du fichier contenant le genome de référence
+ 
+    @sortie: (Boolean) true si il est bien indéxé.
 
     '''
     genomeF1= s+"."+"amb"
@@ -108,11 +132,18 @@ def genReferenceIndexed(s):
 
 def indexGenome(s):
     '''
+    Cette fonction va indéxé le genome de référence et générer les 
+    autre fichiers que l'on doit générer avec le genome de référence 
+    ,ces fichiers serviront à l'étape 3.
+
+    @paramètre:  (string) le nom du fichier contenant le genome de référence
+
+    @sortie: N/A
 
     '''
     os.system("bwa "+"index " + s)
-    os.system("samtools " + "faidx " + s)
-    gatk_cmd_bis = " CreateSequenceDictionary -R "+ s
+    os.system("samtools " + "faidx " + s) # utile à etape 3
+    gatk_cmd_bis = " CreateSequenceDictionary -R "+ s  #gatk besoin dans etape 3
     os.system(path_gatk_java + gatk_cmd_bis)
     if genReferenceIndexed(s):
         return
@@ -123,6 +154,14 @@ def indexGenome(s):
 
 def newGenomeDeReference(s):
     '''
+    Cette fonction va renommer le fichier contenant 
+    le genome de référence en .fasta .
+    A l'etape 3 , on a besoin que notre fichier contenant 
+    le genome de référence. se termine avec .fasta
+
+    @parametre: (string) nom du fichier contenant le genome de référence
+
+    @sortie: (string) le nouveau nom se terminant par .fasta
 
     '''
 
@@ -146,7 +185,13 @@ def newGenomeDeReference(s):
 
 def finder_ftp(fichierTsv):
     '''
+    Retourne la colonne contenant les informations liés à 
+    la colonne fast_ftp
 
+    @parametre: (string) fichier tsv
+
+    @sortie: (entier)
+ 
     '''
     f=open(fichierTsv)
     tsv_toListe = [ i.strip().split('\t') for i in f]
@@ -169,6 +214,12 @@ def finder_ftp(fichierTsv):
 
 def finders_alias(fichierTsv):
     '''
+    Retourne la colonne contenant les informations liés à
+    la colonne sample_alias
+
+    @parametre: (string) fichier tsv
+
+    @sortie: (entier)
 
     '''
     f=open(fichierTsv)
@@ -193,6 +244,11 @@ def finders_alias(fichierTsv):
 
 def finderSampleName(fichierTsv, searchSampleN):
     '''
+    Retourne le sample_alias d'un d'un read
+
+    @parametre: (string,string) fichier tsv, nom du read
+
+    @sortie: (string)
 
     '''
     fileSearching= searchSampleN.split(".")
@@ -221,6 +277,12 @@ def finderSampleName(fichierTsv, searchSampleN):
 
 def strainFinder(monGdeRef):
     '''
+    retourne le strain de notre genome de référence
+
+    @parametre: (string) nom du fichier contenant le genome de référence
+ 
+    @sortie: (string) strain
+
 
     '''
     f= open(monGdeRef)
@@ -239,6 +301,11 @@ def strainFinder(monGdeRef):
 
 def checkNewFile(f):
     '''
+    verifie si un fichier est présent dans le répertoire courant.
+
+    @parametre: (string) nom de fichier
+
+    @sortie: (boolean)
 
     '''
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
@@ -247,8 +314,17 @@ def checkNewFile(f):
 
     return False
 
-def mapping_samtool(FindSampleName,newName_Sam,fichierTsv,genoRef):
+
+def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,genoRef):
     '''
+    Cette fonction va effectuer les appels nécessaires pour le mapping 
+    ainsi que ce nécessaire avant l'obtention de fichier .gvcf et .vcf
+
+    @parametre: (string,string,string,string) read, fichier sam, fichier tsv, genome de réference
+
+
+    @sortie: N/A
+
 
     '''
     sampleName= finderSampleName(fichierTsv,FindSampleName)
@@ -340,8 +416,15 @@ def mapping_samtool(FindSampleName,newName_Sam,fichierTsv,genoRef):
         #bedtools genomecov -ibam    fichier_duplicate.bam  -bga  >   sampleAlis_couv.txt
 
 
-def  mappingCalcul(): # Calculez le % de reads mappent le génome de référence
+def  mappingCalcul(): 
     '''
+    Cette fonction Calcule le pourcentage de reads mappent le génome de référence
+    à partie du fichier généré par samtools flagstat
+
+    @parametre: (N/A)
+
+
+    @sortie: (N/A)
 
     '''
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
@@ -368,8 +451,15 @@ def  mappingCalcul(): # Calculez le % de reads mappent le génome de référence
 
 
 
-def couvertureMapp(): #Calculez la couverture moyenne
+def couvertureMapp(): 
     '''
+    Cette fonction va calculez la couverture moyenne à partir du fichier généré  par
+    bedtools genomcov
+
+    @parametre: (N/A)
+
+    @sortie: (N/A)
+
 
     '''
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
@@ -405,6 +495,14 @@ def couvertureMapp(): #Calculez la couverture moyenne
 
 def mappingPaired(fichierTsv,genoRef,f1,f2):
     '''
+    fonction effectuant le mapping pour les paires end 
+    en obtenant le premier fichier .sam.
+    Si cette étape est fonctionnelle on continue le mapping
+    avec l'appel  à lafonction mapping_and_variant_identification
+
+    @parametre:(string,string,string,string)
+
+    @sortie:(N/A)
 
     '''
     sampleName= finderSampleName(fichierTsv,f1)
@@ -429,13 +527,22 @@ def mappingPaired(fichierTsv,genoRef,f1,f2):
             bwa_map = True
 
     if bwa_map :
-        mapping_samtool(f1,newName_Sam,fichierTsv,genoRef)
+        mapping_and_variant_identification(f1,newName_Sam,fichierTsv,genoRef)
 
 
 
 
 def mappingSingle(fichierTsv,genoRef,f):
     '''
+    fonction effectuant le mapping pour les single end 
+    en obtenant le premier fichier .sam.
+    Si cette étape est fonctionnelle on continue le mapping
+    avec l'appel  à lafonction mapping_and_variant_identification
+
+    @parametre:(string,string,string,string)
+
+    @sortie:(N/A)
+
 
     '''
     sampleName= finderSampleName(fichierTsv,f)
@@ -456,10 +563,16 @@ def mappingSingle(fichierTsv,genoRef,f):
             print("new file : ", newName_Sam)
             bwa_map=True
     if bwa_map :
-        mapping_samtool(f,newName_Sam,fichierTsv,genoRef)
+        mapping_and_variant_identification(f,newName_Sam,fichierTsv,genoRef)
 
 def finders_md5(fichierTsv):
     '''
+    Retourne la colonne contenant les informations liés à
+    la colonne fastq_md5
+
+    @parametre: (string) fichier tsv
+
+    @sortie: (entier)
 
     '''
     f=open(fichierTsv)
@@ -484,6 +597,12 @@ def finders_md5(fichierTsv):
 
 def count_correct(fichierTsv):
     '''
+    Fonction renvoyant le nombre d'échantillon total 
+    dans notre fichier tsv
+
+    @parametre: (string) fichier tsv
+
+    @sortie: (entier)
 
     '''
 
@@ -492,7 +611,6 @@ def count_correct(fichierTsv):
     compteur=0
     md5_f=finders_md5(fichierTsv)
     for i in tsv_toListe:
-       # if len(i)>6:  #première liste= premiere ligne , nous interèsse pas
         if len(i[md5_f])>=32 and (len(i[md5_f].split(";"))>=2 ):
             compteur+=2
         else:
@@ -507,23 +625,38 @@ def find_all_gvcf():
     cette fonction sera appellé à la fin,
     on va chercher tout les fichier ayant pour extension .g.vcf
     est en faire une chaine de la forme : 
-    -V fichier.g.vcf -V fichier2.g.vcf ..
+    -V fichier1.g.vcf -V fichier2.g.vcf ..
     Elle nous servira notamment dans l'appel de la 
-    fonction GenomicsDBImport
+    fonction GenomicsDBImport nécessaire à la consolidation
+
+    @paramètre: (N/A)
+
+    @sortie: (string) concaténation de -V fichier .g.vcf
+
     '''
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
     affiche_ls=affiche_ls.strip().split("\\n")
     sequenceGvcf=""
     for i in affiche_ls:
-        if ".g.vcf.idx" in i:
+        if ".g.vcf.idx" in i: #on skip les .g.vcf.idx
             None
         else:
             if ".g.vcf" in i:
                 sequenceGvcf += " -V " + i 
     return sequenceGvcf
 
+
 ##gatk  GenomicsDBImport -V UFMG-CM-Y624.g.vcf -V UFMG-CM-Y625.g.vcf    --genomicsdb-workspace-path  my_database/ -L intervals.list
 def gatkGenomic():
+    ''' 
+    Cette fonction effectue l'appel necessaire pour la consolidation, on l'appel
+    un fois qu'on a tous les .g.vcf pour chaque echantillons
+
+    @parametre: (N/A)
+
+    @sortie:(N/A)
+
+    '''
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
     #affiche_ls=affiche_ls.strip().split("\\n")
     if "my_database" in affiche_ls:
@@ -535,6 +668,14 @@ def gatkGenomic():
 
 #gatk GenotypeGVCFs -R S288C_reference_sequence_R64-2-1_20150113.fasta -V gendb://my_database -O output.vcf    
 def gatkGenotype(genoRef):
+    '''
+    Cette fonction va effectuer l'appel joint donc
+    d'obtenir notre première table vcf.
+    @parametre: (string) genome de référence
+
+    @sortie: (N/A)
+
+    '''
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
     if "sortieFinale.vcf" in affiche_ls:
         print("Appel joint effectué! ")
@@ -543,6 +684,9 @@ def gatkGenotype(genoRef):
 
 def pipeline(fichierTsv, monGdeRef):
     '''
+    fonction qui fait tout les appels pour effectuer  l'indexation 
+    de genome de reference ,le mapping et 
+    l'identification des variants
 
 
     '''
@@ -568,7 +712,7 @@ def pipeline(fichierTsv, monGdeRef):
         mappingSingle(fichierTsv,monGdeRef,k)
         compteur+=1
 
-    if count_correct(fichierTsv) == compteur :
+    if count_correct(fichierTsv) == compteur : # creation de la table vcf seulement lorsqu'on a finit le mapping
         print("mapping fini ! ")
         doneOrNotMapping=True
 
