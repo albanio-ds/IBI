@@ -10,10 +10,10 @@ fichierTsv ="filereport_read_run_PRJEB24932_tsv.txt"  # à changer
 #fastq_ftp finder
 def finder_ftp(fichierTsv):
     ''' 
-    paramètre: fichier tsv contenant les liens des échantillons à
+    @paramètre: fichier tsv contenant les liens des échantillons à
     télécharger
 
-    sortie: renvoye le numéro de la colonne contenant le champs
+    @sortie: renvoye le numéro de la colonne contenant le champs
     'fastq_ftp'. (entier)
     En cas d'erreur une exception est levée.
 
@@ -39,13 +39,14 @@ def finder_ftp(fichierTsv):
             raise Exception("pas de champs fast_ftp")
     return i
 
+
 #fastq_md5 finder
 def finders_md5(fichierTsv):
-      ''' 
-    paramètre: fichier tsv contenant les liens des échantillons à
+    ''' 
+    @paramètre: fichier tsv contenant les liens des échantillons à
     télécharger
 
-    sortie: renvoye le numéro de la colonne contenant le champs
+    @sortie: renvoye le numéro de la colonne contenant le champs
     'fastq_md5'. (entier)
     En cas d'erreur une exception est levée.
 
@@ -78,11 +79,11 @@ def finders_md5(fichierTsv):
 
 
 def finders_alias(fichierTsv):
-      ''' 
-    paramètre: fichier tsv contenant les liens des échantillons à
+    ''' 
+    @paramètre: fichier tsv contenant les liens des échantillons à
     télécharger
 
-    sortie: renvoye le numéro de la colonne contenant 
+    @sortie: renvoye le numéro de la colonne contenant 
     le champs'sample_alias'. (entier)
 
     En cas d'erreur une exception est levée.
@@ -110,13 +111,11 @@ def finders_alias(fichierTsv):
     return i
 
 def count_correct(fichierTsv):
-       ''' 
-    paramètre: fichier tsv contenant les liens des échantillons à
+    ''' 
+    @paramètre: fichier tsv contenant les liens des échantillons à
     télécharger
 
-    sortie: renvoye le nombre de lien à télécharger (entier)
-
-   
+    @sortie: renvoye le nombre de lien à télécharger (entier)
 
     '''
 
@@ -142,9 +141,9 @@ def telecharge(lien,md5_value):
     Cette fonction s'occupe du téléchargement des fichiers et garantie leurs origine à l'aide 
     des vérifications md5.
 
-    paramètre:  liengz , md5 associé au lien
+    @paramètre:  liengz , md5 associé au lien
 
-    sortie: télécharge le lien gz demandé et verifie le md5   
+    @sortie: télécharge le lien gz demandé et verifie le md5   
 
     Fonctionnalité: 
         -Si l'utilisateur décide d'arrêter le téléchargement par exemple si ça connexion est insuffisante
@@ -169,6 +168,7 @@ def telecharge(lien,md5_value):
         parseMd5_recup = recupMd5[1].split(' ')
         if(md5_value == parseMd5_recup[0]):
             print("TAR :" +  lien_targz[-1] + " téléchargement fini..")
+            os.system("gunzip "+ lien_targz[-1])
             estDl=True
         if tentative ==2 :
             delete =  lien_targz[-1]+"*"
