@@ -7,7 +7,6 @@ from statistics import mean
 
 '''
 Prérequis
-Unzip les fichiers .gz avant de commencer cette étape
 modifier les variables ci-dessous marqué à coté "a changer" avec les noms de fichiers respectifs
 
 genome_de_reference : par le fichiers contenant le genome de référence (.fasta ou .fsa)
@@ -488,7 +487,7 @@ def couvertureMapp():
     leMin =min(moyTab)
     leMax=max(moyTab)
     lamoyenneToTal=round(mean(moyTab))
-    print("la moyenne =", lamoyenneToTal  ,"le min = ", leMin , " le max = ", leMax )
+    print("la moyenne =", lamoyenneToTal  ," le min = ", leMin , " le max = ", leMax )
 
 
 
@@ -620,6 +619,7 @@ def count_correct(fichierTsv):
 
     return compteur
 
+
 def find_all_gvcf():
     '''
     cette fonction sera appellé à la fin,
@@ -661,10 +661,16 @@ def gatkGenomic():
     #affiche_ls=affiche_ls.strip().split("\\n")
     if "my_database" in affiche_ls:
         print("Consolidation effectué !")
-        return
-    allgvcf = find_all_gvcf()
-    os.system(path_gatk_java +  " GenomicsDBImport " + allgvcf + " --genomicsdb-workspace-path  my_database/ " + " -L " + " intervals.list" )
-
+        return True
+    else:
+        allgvcf = find_all_gvcf()
+        os.system(path_gatk_java +  " GenomicsDBImport " + allgvcf + " --genomicsdb-workspace-path  my_database/ " + " -L " + " intervals.list" )
+        if "my_database" in affiche_ls:
+            print("Consolidation effectué !")
+            return True
+        else:
+            print("Consolidation non effectué! ")
+            return False
 
 #gatk GenotypeGVCFs -R S288C_reference_sequence_R64-2-1_20150113.fasta -V gendb://my_database -O output.vcf    
 def gatkGenotype(genoRef):
@@ -679,8 +685,147 @@ def gatkGenotype(genoRef):
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
     if "sortieFinale.vcf" in affiche_ls:
         print("Appel joint effectué! ")
-        return 
-    os.system(path_gatk_java + " GenotypeGVCFs" + " -R " + genoRef + " -V " + "gendb://my_database " + " -O " + " sortieFinale.vcf" )
+        return True
+    else: 
+        os.system(path_gatk_java + " GenotypeGVCFs" + " -R " + genoRef + " -V " + "gendb://my_database " + " -O " + " sortieFinale.vcf" )
+        if "sortieFinale.vcf" in affiche_ls:
+            print("Appel joint effectué! ")
+            return True
+        else:
+            print("Appel joint non effectué! ")
+            return False
+
+
+def mean(lst):
+    return sum(lst) / len(lst)
+
+def filterValue():
+    tab=os.popen('bcftools query -f "%QD %MQ %MQRankSum %FS %SOR %ReadPosRankSum\n" sortieFinale.vcf').readlines()
+
+    for i in range(len(tab)):
+        tab[i] = tab[i].replace('\n', '')
+
+    qd = []
+    mq = []
+    mqrs = []
+    fs = []
+    sor = []
+    rprs = []
+
+    for e in tab:
+        splited = e.split(' ')
+    
+        if splited[0] != '.':
+            qd.append(float(splited[0]))
+        
+        if splited[1] != '.':
+            mq.append(float(splited[1]))
+            
+        if splited[2] != '.':
+            mqrs.append(float(splited[2]))
+            
+        if splited[3] != '.':
+            fs.append(float(splited[3]))
+            
+        if splited[4] != '.':
+            sor.append(float(splited[4]))
+            
+        if splited[5] != '.':
+            rprs.append(float(splited[5]))
+
+
+    contenu =  "La moyenne des QD est : " + str(mean(qd)) + ' \n'
+    contenu += "La moyenne des MQ est : " + str(mean(mq)) + ' \n'
+    contenu += "La moyenne des MQRankSum est : " + str(mean(mqrs))  + ' \n'
+    contenu += "La moyenne des FS est : " + str(mean(fs))  + ' \n'
+    contenu += "La moyenne des SOR est : " + str(mean(sor)) + ' \n'
+    contenu += "La moyenne des ReadPosRankSum est : " + str(mean(rprs))  + ' \n'
+    f = open("filtreValeur.txt", "w")
+    f.write(contenu)
+    f.close()
+
+
+def gatkVariant_and_filter_Finding(genoRef):
+    filterIsDone= False
+    vcfObtain = False
+    variantSelect =False
+    vcfForR = False
+
+    if(checkNewFile("sortieFinale.vcf")):
+            vcfObtain = True
+    if vcfObtain : 
+        if checkNewFile("variantSelected.vcf"):
+            print("Variant selection done ! ")
+            variantSelect = True
+        else : 
+            os.system(path_gatk_java + " SelectVariants " + " -R " + genoRef + " -V "+ "sortieFinale.vcf " + " --select-type-to-include SNP " + " -O " + "variantSelected.vcf"  )
+            if checkNewFile("variantSelected.vcf"):
+                variantSelect = True
+    if variantSelect :
+        if checkNewFile("filtreValeur.txt"):
+            print("filtre trouvé ! ")
+            filterIsDone = True
+        else: 
+            filterValue()
+        #script pour trouver les filtres
+            if checkNewFile("filtreValeur.txt") : 
+                filterIsDone=True
+    if filterIsDone : 
+        if checkNewFile("forFiltration.vcf"):
+            print(" vcf for R ready ! ")
+            vcfForR=True
+        else:
+            
+            headerVcf= "%CHROM %POS %REF %ALT %QD %FS %MQ %MQRankSum %ReadPosRankSum %SOR %DP\n"
+                #ajouter entete manuellement
+                #bcftools query -f '%CHROM %POS %REF %ALT %QD %FS %MQ %MQRankSum %ReadPosRankSum %SOR %DP\n' sortieFinale.vcf > forFiltration.vcf
+            os.system("bcftools query"  + " -f " + " '" +  headerVcf  + "' " + " variantSelected.vcf " + " > forFiltration.vcf")
+            os.system ("sed -i "  +  " '" +  "1iCHROM POS REF   ALT    QD     FS    MQ MQRankSum ReadPosRankSum SOR    DP" +  "'"  +  " forFiltration.vcf")
+
+                #on pourra lancer le script R
+            if checkNewFile("forFiltration.vcf"):
+                vcfForR=True
+    if vcfForR : 
+        #lancer le script R
+        os.system("Rscript " + " filtration.R")
+        return True
+    else:
+         print("Selection variant et filtre non trouvé !!!")
+        return False
+
+
+#gatk VariantFiltration -R S288C_reference_sequence_R64-2-1_20150113.fasta  -V variantSelected.vcf  -O filtrationIsDone.vcf --filter-expression "QD > 19.9 || FS > 1.0 || SOR > 0.1   ||MQ > 60.0 || MQRankSum > 1.0 ||ReadPosRankSum > 0.12945328565870648" --filterName "monFiltre"
+def applyFiltration(genoRef):
+
+    if checkNewFile("filtrationIsDone.vcf"):
+        print("La filtration a été effectué ! ")
+        return True
+    else:
+        os.system(path_gatk_java + " VariantFiltration -R " + genoRef + " -V variantSelected.vcf" + " -O filtrationIsDone.vcf " + " --filter-expression  " +  "'"  + "QD > 19.9 || FS > 1.0 || SOR > 0.1   || MQ > 60.0 || MQRankSum > 1.0 || ReadPosRankSum > 0.12945328565870648"    +"'" +  " --filter-name" + " '" + "monFiltre" + "'")
+         if checkNewFile("filtrationIsDone.vcf"):
+            print("La filtration a été effectué ! ")
+            return True
+        else:
+            print("Filtration RATE !!!")
+            return False
+#apres applyFiltration
+def visualisation_After_Filtration():
+    if(checkNewFile("forVisual.vcf")):
+        os.system("Rscript " + " analyse.R")
+    else:
+        headerVcf= "%CHROM %POS %REF %ALT %QD %FS %MQ %MQRankSum %ReadPosRankSum %SOR %DP\n"
+        os.system("bcftools query"  + " -f " + " '" +  headerVcf  + "' " + " filtrationIsDone.vcf" + " > forVisual.vcf")
+        os.system ("sed -i "  +  " '" +  "1iCHROM POS REF   ALT    QD     FS    MQ MQRankSum ReadPosRankSum SOR    DP" +  "'"  +  " forVisual.vcf")
+        #ajouter l'entete
+        if(checkNewFile("forVisual.vcf")):
+            os.system("Rscript " + " analyse.R")  ### faire ANALYSE
+
+
+def afficheArbrePcA():
+    if checkNewFile("filtrationIsDone.vcf"):
+        os.sytem("Rscript " + "arbre.R")
+
+
 
 def pipeline(fichierTsv, monGdeRef):
     '''
@@ -695,7 +840,9 @@ def pipeline(fichierTsv, monGdeRef):
     compteur=0
     doneOrNotMapping= False
     gvcfDone=False
-   # vcfDone =False
+    vcfDone =False
+    gatkVariantFiltering = False
+    filtrationApply = False
     if genReferenceIndexed(monGdeRef):
         print("Le genome de réference a bien été indexé !")
     else:
@@ -722,14 +869,15 @@ def pipeline(fichierTsv, monGdeRef):
     #     print("La couverture moyenne (veuillez patienter..): ")
     #     couvertureMapp()
     if doneOrNotMapping:
-        gatkGenomic()
-        gvcfDone=True
-    if gvcfDone:
-        gatkGenotype(monGdeRef)
-
-
-
-
+        if gatkGenomic():
+            if gatkGenotype(monGdeRef):
+                if gatkVariant_and_filter_Finding(monGdeRef)
+                    if gatkVariantFiltering : 
+                        if applyFiltration(monGdeRef):
+                            afficheArbrePcA()                            
+                            return
+                    
+                        
 
 
 ##############
