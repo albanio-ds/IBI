@@ -1,3 +1,4 @@
+
 # Introduction
 Projet intégré de bioinformatique : construction d'un pipeline de préparation de
 données génomiques.
@@ -17,13 +18,27 @@ Année Universitaire 2021
 Fanny POUYET et Marine DJAFFARDJY
 
 Option: Projet intégré de bioinformatique 
+# Pré-requis: 
 
-# Information concernant les scripts (prérequis)
-* Le fichier TSV nécessaire au téléchargement et le fichier contenant le génome de référence doivent être dans le même dossier 
+* python3
+* samtools
+* bwa 
+* gatk
+* bedtools
+* bcftools
+* R
+# packages R :
+* install.packages("BiocManager")
+* BiocManager::install("SNPRelate")
+* install.packages("ape")
+* install.packages("RColorBrewer")
+* install.packages("VennDiagram")
+
+# Information concernant les scripts:
 
 * Remplacer les champs marqué avec '<b>a changer </b>' c'est à dire :
 
-Dans le <b>downloadReads.py</b> : l
+Dans le <b>downloadReads.py</b> : 
 * le fichier TSV.
 
 Dans le <b>mappingAndMore.py</b> : 
@@ -33,28 +48,40 @@ Dans le <b>mappingAndMore.py</b> :
 *  'java -jar le chemin vers le jar gatk-package-4.1.9.0-local.jar'
 
 #Concernant downloadReads.py
-
+ ```sh
+python3 downloadReads.py
+```  
+En fonction de votre connexion, le téléchargement sera plus où moins long.
+* Pour lancer ce script le seul fichier nécessaire est le fichier .tsv
+* Vous pouvez annulez le téléchargement à tout moment en faisant ctrl+c, 2 fois.
+* Les fonctions sont directement commentées
 
 #Concernant  mappingAndMore.py
 
+ ```sh
+python3 mappingAndMore.py
+```  
+Ce script nécessite  une dizaine d'heure pour s'éxecuter.
 
-# Utilisation des  scripts:
+* Fichier nécessaire : .
+	  tsv ,
+	  fichier contenant le genome de réference (généralement .fsa, .fasta), 
+	  les .fastq (reads)
+	  liste intervalle genomique
+	  2 fichiers R, -> un qui va servir pour visualiser les données à filtrées (QD,FS..)
+	                      -> un qui servira à faire notre arbre PCA
 
-* Lancer le téléchargement des échantillons :
-`python3 downloadReads.py`
+* Tous ces fichiers doivent être dans le même répertoire (voir le répertoire <b>exemple</b>)
+ 
+* Les fonctions sont directement commentées
 
-* Lancer le mapping et le marquage  des reads
-`python3 mappingAndMore.py`
-
-# Organisation du code
-
-Le dossier script/ contient les scripts python à lancer dans l'ordre suivant : 
-	*  downloadReads.py
-	*  mappingAndMore.py
 
 
 # Difficultés rencontré
 
-* Installation de GATK
+* mappingAndMore.py demande énormément de temps et pas mal ressource, concernant notre groupe on ne pouvait pas se permettre de lancer un tel script en semaine
 * aucun soucci concernant le code python
 
+# Ce qu'on aurait aimé améliorer
+
+* Ajouter une interface interractive pour que la pipeline soit plus user-friendly.
