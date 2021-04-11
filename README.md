@@ -69,8 +69,8 @@ Ce script nécessite  une dizaine d'heure pour s'éxecuter.
 -les .fastq (reads)
 -liste intervalle genomique
 -2 fichiers R :  
- 		 un qui va servir pour visualiser les données à filtrées (QD,FS..)
-		 un qui servira à faire notre arbre PCA`
+    - un qui va servir pour visualiser les données à filtrées (QD,FS..)
+	- un qui servira à faire notre arbre PCA`
 
 * Tous ces fichiers doivent être dans le même répertoire (voir le répertoire <b>exemple</b>)
  
