@@ -64,11 +64,11 @@ python3 mappingAndMore.py
 Ce script nécessite  une dizaine d'heure pour s'éxecuter.
 
 * Fichier nécessaire : 
-    `-tsv`
-    `-fichier contenant le genome de réference (généralement .fsa, .fasta)`
-     `-les .fastq (reads) `
-     `-liste intervalle genomique `
-     `-2 fichiers R :   `
+    - `-tsv`
+   - `-fichier contenant le genome de réference (généralement .fsa, .fasta)`
+   -  `-les .fastq (reads) `
+    - `-liste intervalle genomique `
+    - `-2 fichiers R :   `
     - ` un qui va servir pour visualiser les données à filtrées (QD,FS..) `
 	-  `un qui servira à faire notre arbre PCA` 
 
