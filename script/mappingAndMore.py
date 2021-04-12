@@ -21,8 +21,7 @@ genome_de_reference_fsa ="S288C_reference_sequence_R64-2-1_20150113.fasta" # a c
 path_gatk_java ="java -jar /home/jeyanthan/Documents/coursL3/S6/IBI/Gatk/gatk-4.1.9.0/gatk-package-4.1.9.0-local.jar" # a changer
 fichierTsv = "filereport_read_run_PRJEB24932_tsv.txt" # a changer
 
-#Les reads sont au format fastq qui a comme extension soit .fastq soit .fq. Ils peuvent etre utilisés compressés (pas de pb).
-
+ 
 def getPaireEnd():
     '''
     Cette fonction verifie si deux fichiers appartiennent à un
@@ -70,8 +69,7 @@ def checkSingleEnd(myRead):
                 p+=1
     return p
 
-#ex : ERR43242_1.fastq
-def getSingleEnd():
+ def getSingleEnd():
     '''
     cette fonction permet de récupérer l'ensemble des single end dans le répertoire courant.
 
@@ -93,16 +91,7 @@ def getSingleEnd():
     return singleRead
 
 
-
-#s.fsa.amb
-#s.fsa.ann
-#s.fsa.bwt
-#s.fsa.pac
-#s.fsa.sa
-
-#Le genome de référence doit etre au format fasta qui a comme extension soit .fasta soit .fa soit .fsa
-
-#
+ 
 
 def genReferenceIndexed(s):
     '''
@@ -174,13 +163,7 @@ def newGenomeDeReference(s):
 
 
 
-#read1="ERR2299966_1.fastq"
-#read2="ERR2299966_2"
-#nv_noms=read1+"_"+read2
-#bwa index  S288C_reference_sequence_R64-2-1_20150113.fsa
-
-#bwa mem genome_de_reference read1.fastq read2.fastq >  nv_noms
- #recup le nom de la souche
+ 
 
 def finder_ftp(fichierTsv):
     '''
@@ -230,7 +213,6 @@ def finders_alias(fichierTsv):
             while not finder and  i<len(row):
                 if row[i]=="sample_alias":
                     finder=True
-                    #print("trouvé", i )
                     return i
                 else:
                     i+=1
@@ -263,11 +245,8 @@ def finderSampleName(fichierTsv, searchSampleN):
         lienSansGz = lienSansGz[0].split("/")
         lienf= lienSansGz[-1].split(".")
         lienfinale = lienf[0]
-      #  print(lienfinale)
         if lienfinale ==correctName:
-           # print(lienf[0], "son sample name = ", i[sample_column])
             sample_name= i[sample_column]
-            #print(sample_name)
             return sample_name
 
     if sample_name =="":
@@ -291,7 +270,6 @@ def strainFinder(monGdeRef):
     for i in firstLigne :
         if "strain=" in i :
             strainRet = i.split("=")[1][:-2].strip()
-           # print("mon strain :" ,strainRet)
             return strainRet
 
     if strainRet=="":
@@ -366,16 +344,13 @@ def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,gen
             print(newName_BamDupl, " is already there! ")
             gatk_markDupl=True
         else:
-            #gatk MarkDuplicatesSpark  -I input.bam -O marked_duplicated.bam
 
             gatk_cmd_bis=" MarkDuplicatesSpark " + "-I " + newName_BamSort + " " +"-O " + newName_BamDupl
-
             os.system(path_gatk_java + gatk_cmd_bis)
             if checkNewFile(newName_BamDupl):
                 gatk_markDupl=True
 
     if gatk_markDupl:
-        #samtools flagstat aln.sorted.bam
         if checkNewFile(newName_BamFlag):
             print(newName_BamFlag, " is already there! ")
             samtool_flags=True
@@ -402,7 +377,6 @@ def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,gen
                 gatk_haplot=True
 
     return
-        #bedtools genomecov -ibam    fichier_duplicate.bam  -bga  >   sampleAlis_couv.txt
 
 
 def  mappingCalcul():
@@ -461,7 +435,6 @@ def couvertureMapp():
         fichier=affiche_ls[i].split("_")
         if len(fichier)==2:
             if fichier[1]=="couv.txt":
-                #print(fichier)
                 file_name ="_".join(fichier)
                 map_file = open(file_name)
                 fileToList = [ i.strip().split('\t') for i in map_file]
@@ -497,19 +470,16 @@ def mappingPaired(fichierTsv,genoRef,f1,f2):
     sampleName= finderSampleName(fichierTsv,f1)
     newName_Sam= sampleName + ".sam"
     strainName = strainFinder(genoRef)
-    #print("bwa "+ "mem " +genoRef + " " + f1 + " " + f2 + " >" + newName)
     rg_id = strainName+"-"+sampleName
     rg_sm = sampleName
     rg_flag = repr("@RG\tID:"+ rg_id +"\tSM:" + rg_sm + "\tPL:Illumina\tPU:0\tLB:1")
     bwa_map =False
     samtool_map=False
-    #print(newName_Sam)
     if checkNewFile(newName_Sam) :
 
         print(newName_Sam, " is already there! ")
         bwa_map = True
     if not checkNewFile(newName_Sam) :
-        #print("bwa "+ "mem " +"-R " + rg_flag+ " " +genoRef +" " +  f1 + " " + f2 + " >" + newName)
         os.system("bwa "+ "mem " +"-R " + rg_flag+ " " +genoRef +" " +  f1 + " " + f2 + " >" + newName_Sam)
         if checkNewFile(newName_Sam) :
             print("new file : ", newName_Sam)
@@ -546,7 +516,6 @@ def mappingSingle(fichierTsv,genoRef,f):
         print(newName_Sam, " is already there! ")
         bwa_map= True
     if not checkNewFile(newName_Sam) :
-        #print("bwa "+ "mem " +"-R " + rg_flag+ " " +genoRef +" " +  f + " >" + newName)
         os.system("bwa "+ "mem " +"-R " + rg_flag+ " " +genoRef +" " +  f + " >" + newName_Sam)
         if checkNewFile(newName_Sam):
             print("new file : ", newName_Sam)
@@ -573,7 +542,6 @@ def finders_md5(fichierTsv):
             while not finder and  i<len(row):
                 if row[i]=="fastq_md5":
                     finder=True
-                   # print("trouvé", i )
                     return i
                 else:
                     i+=1
@@ -636,7 +604,6 @@ def find_all_gvcf():
     return sequenceGvcf
 
 
-##gatk  GenomicsDBImport -V UFMG-CM-Y624.g.vcf -V UFMG-CM-Y625.g.vcf    --genomicsdb-workspace-path  my_database/ -L intervals.list
 def gatkGenomic():
     '''
     Cette fonction effectue l'appel necessaire pour la consolidation, on l'appel
@@ -662,7 +629,6 @@ def gatkGenomic():
             print("Consolidation non effectué! ")
             return False
 
-#gatk GenotypeGVCFs -R S288C_reference_sequence_R64-2-1_20150113.fasta -V gendb://my_database -O output.vcf
 def gatkGenotype(genoRef):
     '''
     Cette fonction va effectuer l'appel joint donc
@@ -690,6 +656,11 @@ def mean(lst):
     return sum(lst) / len(lst)
 
 def filterValue():
+    '''
+    on effectue une moyenne sur chaque valeur de filtre
+    et on renvoye le resultat dans le fichier filtreValeur.txt
+
+    '''
     tab=os.popen('bcftools query -f "%QD %MQ %MQRankSum %FS %SOR %ReadPosRankSum\n" sortieFinale.vcf').readlines()
 
     for i in range(len(tab)):
@@ -767,8 +738,6 @@ def gatkVariant_and_filter_Finding(genoRef):
         else:
 
             headerVcf= "%CHROM %POS %REF %ALT %QD %FS %MQ %MQRankSum %ReadPosRankSum %SOR %DP\n"
-                #ajouter entete manuellement
-                #bcftools query -f '%CHROM %POS %REF %ALT %QD %FS %MQ %MQRankSum %ReadPosRankSum %SOR %DP\n' sortieFinale.vcf > forFiltration.vcf
             os.system("bcftools query"  + " -f " + " '" +  headerVcf  + "' " + " variantSelected.vcf " + " > forFiltration.vcf")
             os.system ("sed -i "  +  " '" +  "1iCHROM POS REF   ALT    QD     FS    MQ MQRankSum ReadPosRankSum SOR    DP" +  "'"  +  " forFiltration.vcf")
 
@@ -784,7 +753,6 @@ def gatkVariant_and_filter_Finding(genoRef):
         return False
 
 
-#gatk VariantFiltration -R S288C_reference_sequence_R64-2-1_20150113.fasta  -V variantSelected.vcf  -O filtrationIsDone.vcf --filter-expression "QD > 19.9 || FS > 1.0 || SOR > 0.1   ||MQ > 60.0 || MQRankSum > 1.0 ||ReadPosRankSum > 0.12945328565870648" --filterName "monFiltre"
 
 def applyFiltration(genoRef):
     if checkNewFile("filtrationIsDone.vcf"):
@@ -798,17 +766,8 @@ def applyFiltration(genoRef):
         else:
             print("Filtration RATE !!!")
             return False
-#apres applyFiltration
-def visualisation_After_Filtration():
-    if(checkNewFile("forVisual.vcf")):
-        os.system("Rscript " + " analyse.R")
-    else:
-        headerVcf= "%CHROM %POS %REF %ALT %QD %FS %MQ %MQRankSum %ReadPosRankSum %SOR %DP\n"
-        os.system("bcftools query"  + " -f " + " '" +  headerVcf  + "' " + " filtrationIsDone.vcf" + " > forVisual.vcf")
-        os.system ("sed -i "  +  " '" +  "1iCHROM POS REF   ALT    QD     FS    MQ MQRankSum ReadPosRankSum SOR    DP" +  "'"  +  " forVisual.vcf")
-        #ajouter l'entete
-        if(checkNewFile("forVisual.vcf")):
-            os.system("Rscript " + " analyse.R")  ### faire ANALYSE
+
+
 
 
 def afficheArbrePcA():
@@ -827,10 +786,7 @@ def pipeline(fichierTsv, monGdeRef):
     readSinglEnd=getSingleEnd()
     compteur=0
     doneOrNotMapping= False
-    gvcfDone=False
-    vcfDone =False
-    gatkVariantFiltering = False
-    filtrationApply = False
+  
     if genReferenceIndexed(monGdeRef):
         print("Le genome de réference a bien été indexé !")
     else:
@@ -847,7 +803,7 @@ def pipeline(fichierTsv, monGdeRef):
         mappingSingle(fichierTsv,monGdeRef,k)
         compteur+=1
 
-    if count_correct(fichierTsv) == compteur : # creation de la table vcf seulement lorsqu'on a finit le mapping
+    if count_correct(fichierTsv) == compteur : 
         print("mapping fini ! ")
         doneOrNotMapping=True
 
@@ -864,18 +820,15 @@ genome_de_reference_fasta = newGenomeDeReference(genome_de_reference_fsa)
 pipeline(fichierTsv,genome_de_reference_fasta)
 
 #mappingCalcul()
+#couvertureMapp()
 #################
 
 
-#####
-#couvertureMapp()
 
 
 
 
 
-   # if doneOrNot :
-    #     print(" Le pourcentage de reads mappent le génome de référence : ")
-    #     mappingCalcul()
-    #     print("La couverture moyenne (veuillez patienter..): ")
-    #     couvertureMapp()
+
+
+  
