@@ -324,7 +324,7 @@ def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,gen
         samtool_view=True
 
     if not checkNewFile(newName_Bam):
-        #samtools view -o aln.bam aln.sam.gz
+       
         os.system("samtools " + "view " + "-o " + newName_Bam + " " + newName_Sam  )
         if checkNewFile(newName_Bam):
             samtool_view=True
@@ -616,7 +616,7 @@ def gatkGenomic():
 
     '''
     affiche_ls = str(subprocess.check_output("ls" ,shell=True))
-    #affiche_ls=affiche_ls.strip().split("\\n")
+    
     if "my_database" in affiche_ls:
         print("Consolidation effectué !")
         return True
