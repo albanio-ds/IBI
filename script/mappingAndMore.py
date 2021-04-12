@@ -349,7 +349,7 @@ def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,gen
     if not checkNewFile(newName_Bam):
         #samtools view -o aln.bam aln.sam.gz
         os.system("samtools " + "view " + "-o " + newName_Bam + " " + newName_Sam  )
-        if checkNewFile(newName_Sam):
+        if checkNewFile(newName_Bam):
             samtool_view=True
     if samtool_view :
         #on passe à samtools sort
@@ -391,7 +391,7 @@ def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,gen
             bedtools_couv=True
         else:
             os.system("bedtools " + "genomecov " + "-ibam " +  newName_BamDupl  + " -bga" + " > " + newName_BamCouv )
-            if checkNewFile(newName_BamFlag):
+            if checkNewFile(newName_BamCouv):
                 bedtools_couv=True
     if bedtools_couv:
         if checkNewFile(newName_Bam_Bai):
