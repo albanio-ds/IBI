@@ -69,7 +69,7 @@ def checkSingleEnd(myRead):
                 p+=1
     return p
 
- def getSingleEnd():
+def getSingleEnd():
     '''
     cette fonction permet de récupérer l'ensemble des single end dans le répertoire courant.
 
@@ -347,6 +347,7 @@ def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,gen
 
             gatk_cmd_bis=" MarkDuplicatesSpark " + "-I " + newName_BamSort + " " +"-O " + newName_BamDupl
             os.system(path_gatk_java + gatk_cmd_bis)
+
             if checkNewFile(newName_BamDupl):
                 gatk_markDupl=True
 
