@@ -863,19 +863,10 @@ def pipeline(fichierTsv, monGdeRef):
         print("mapping fini ! ")
         doneOrNotMapping=True
 
-    # if doneOrNot :
-    #     print(" Le pourcentage de reads mappent le génome de référence : ")
-    #     mappingCalcul()
-    #     print("La couverture moyenne (veuillez patienter..): ")
-    #     couvertureMapp()
-    if doneOrNotMapping:
-        if gatkGenomic():
-            if gatkGenotype(monGdeRef):
-                if gatkVariant_and_filter_Finding(monGdeRef):
-                    if gatkVariantFiltering :
-                        if applyFiltration(monGdeRef):
-                            afficheArbrePcA()
-                            return
+ 
+    if doneOrNotMapping and  gatkGenomic() and  gatkGenotype(monGdeRef) and  gatkVariant_and_filter_Finding(monGdeRef) and gatkVariantFiltering  and applyFiltration(monGdeRef):
+        afficheArbrePcA()
+        return
 
 
 
@@ -890,3 +881,13 @@ pipeline(fichierTsv,genome_de_reference_fasta)
 
 #####
 #couvertureMapp()
+
+
+
+
+
+   # if doneOrNot :
+    #     print(" Le pourcentage de reads mappent le génome de référence : ")
+    #     mappingCalcul()
+    #     print("La couverture moyenne (veuillez patienter..): ")
+    #     couvertureMapp()
