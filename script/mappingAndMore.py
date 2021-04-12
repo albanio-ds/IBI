@@ -340,7 +340,6 @@ def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,gen
     gatk_markDupl =False
     samtool_flags=False
     bedtools_couv=False
-    samtool_index=False
     gatk_haplot=False
     if checkNewFile(newName_Bam):
         print(newName_Bam, " is already there! ")
@@ -372,10 +371,9 @@ def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,gen
             gatk_cmd_bis=" MarkDuplicatesSpark " + "-I " + newName_BamSort + " " +"-O " + newName_BamDupl
 
             os.system(path_gatk_java + gatk_cmd_bis)
-
-
             if checkNewFile(newName_BamDupl):
                 gatk_markDupl=True
+
     if gatk_markDupl:
         #samtools flagstat aln.sorted.bam
         if checkNewFile(newName_BamFlag):
@@ -394,14 +392,6 @@ def mapping_and_variant_identification(FindSampleName,newName_Sam,fichierTsv,gen
             if checkNewFile(newName_BamCouv):
                 bedtools_couv=True
     if bedtools_couv:
-        if checkNewFile(newName_Bam_Bai):
-             samtool_index=True
-        else:
-            os.system("samtools "+ "index "+ newName_BamDupl )
-            if checkNewFile(newName_Bam_Bai):
-                print(newName_Bam_Bai, " is already there! ")
-                samtool_index=True
-    if samtool_index:
         if checkNewFile(newName_Gvcf_Haplot):
             print(newName_Gvcf_Haplot, " is already there! ")
             gatk_haplot=True
@@ -823,7 +813,7 @@ def visualisation_After_Filtration():
 
 def afficheArbrePcA():
     if checkNewFile("filtrationIsDone.vcf"):
-        os.sytem("Rscript " + "arbre.R")
+        os.system("Rscript " + "arbre.R")
 
 
 
@@ -832,8 +822,6 @@ def pipeline(fichierTsv, monGdeRef):
     fonction qui fait tout les appels pour effectuer  l'indexation
     de genome de reference ,le mapping et
     l'identification des variants
-
-
     '''
     readPairEnd=getPaireEnd()
     readSinglEnd=getSingleEnd()
@@ -864,7 +852,7 @@ def pipeline(fichierTsv, monGdeRef):
         doneOrNotMapping=True
 
  
-    if doneOrNotMapping and  gatkGenomic() and  gatkGenotype(monGdeRef) and  gatkVariant_and_filter_Finding(monGdeRef) and gatkVariantFiltering  and applyFiltration(monGdeRef):
+    if doneOrNotMapping and  gatkGenomic() and  gatkGenotype(monGdeRef) and  gatkVariant_and_filter_Finding(monGdeRef)   and applyFiltration(monGdeRef):
         afficheArbrePcA()
         return
 
