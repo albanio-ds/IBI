@@ -39,13 +39,15 @@ Option: Projet intégré de bioinformatique
 * Remplacer les champs marqué avec '<b>a changer </b>' c'est à dire :
 
 Dans le <b>downloadReads.py</b> : 
-* le fichier TSV.
+* le fichier TSV. (fichier obligatoire)
 
 Dans le <b>mappingAndMore.py</b> : 
 
-* le fichier TSV 
-* le fichier contenant le genome de référence 
-*  'java -jar le chemin vers le jar gatk-package-4.1.9.0-local.jar'
+* le fichier TSV (fichier obligatoire)
+* le fichier contenant le genome de référence (fichier obligatoire)
+*  'java -jar le chemin vers le jar gatk-package-4.1.9.0-local.jar' (obligatoire)
+*  liste des positions de chromosomes (fichier obligatoire)
+*  exception : 2 fichiers R arbre.R et filtration.R (contenant des valeurs brutes)
 
 # Concernant downloadReads.py
  ```sh
