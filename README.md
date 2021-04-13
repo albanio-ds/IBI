@@ -47,7 +47,7 @@ Dans le <b>mappingAndMore.py</b> :
 * le fichier contenant le genome de référence (fichier obligatoire)
 *  'java -jar le chemin vers le jar gatk-package-4.1.9.0-local.jar' (obligatoire)
 *  liste des positions de chromosomes (fichier obligatoire)
-*  exception : 2 fichiers R arbre.R et filtration.R (contenant des valeurs brutes)
+*  exception : 2 fichiers R arbre.R et filtration.R contenant des valeurs brutes (obligatoire pour avoir les mêmes figures que nous)
 
 # Concernant downloadReads.py
  ```sh
