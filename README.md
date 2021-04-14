@@ -27,6 +27,7 @@ Option: Projet intégré de bioinformatique
 * bedtools
 * bcftools
 * R
+
 # packages R :
 * install.packages("BiocManager")
 * BiocManager::install("SNPRelate")
@@ -36,7 +37,7 @@ Option: Projet intégré de bioinformatique
 
 # Information concernant les scripts:
 
-* Remplacer les champs marqué avec '<b>a changer </b>' c'est à dire :
+* Remplacer les champs marqués avec '<b>a changer </b>' c'est à dire :
 
 Dans le <b>downloadReads.py</b> : 
 * le fichier TSV. (fichier obligatoire)
@@ -53,10 +54,10 @@ Dans le <b>mappingAndMore.py</b> :
  ```sh
 python3 downloadReads.py
 ```  
-En fonction de votre connexion, le téléchargement sera plus où moins long.
+En fonction de votre connexion, le téléchargement sera plus ou moins long.
 * Fichier nécessaire :
 	- `tsv`
-* Vous pouvez annulez le téléchargement à tout moment en faisant ctrl+c, 2 fois.
+* Vous pouvez annuler le téléchargement à tout moment en faisant ctrl+c, 2 fois.
 * Les fonctions sont directement commentées
 
 # Concernant  mappingAndMore.py
@@ -64,25 +65,25 @@ En fonction de votre connexion, le téléchargement sera plus où moins long.
  ```sh
 python3 mappingAndMore.py
 ```  
-Ce script nécessite  une dizaine d'heure pour s'éxecuter.
+Ce script nécessite une dizaine d'heures pour s'éxecuter.
 
-* Fichier nécessaire : 
+* Fichiers nécessaires : 
     - `tsv`
    - `fichier contenant le genome de réference (généralement .fsa, .fasta)`
    -  `les .fastq (que vous avez obtenu en lançant downloadReads.py) `
     - `liste intervalle genomique `
     - `2 fichiers R :   `
-    - ` un qui va servir pour visualiser les données à filtrées (QD,FS..) `
+    - ` un qui va servir pour visualiser les données à filtrer (QD,FS..) `
 	-  `un qui servira à faire notre arbre PCA` 
 
 * Tous ces fichiers doivent être dans le même répertoire (voir le répertoire <b>ready</b>)
  
 * Les fonctions sont directement commentées
 
-# Difficultés rencontré
+# Difficultés rencontrées
 
-* mappingAndMore.py demande énormément de temps et pas mal ressource, concernant notre groupe on ne pouvait pas se permettre de lancer un tel script en semaine
-* aucun soucci concernant le code python
+* mappingAndMore.py demande énormément de temps et pas mal de ressources, concernant notre groupe on ne pouvait pas se permettre de lancer un tel script en semaine
+* aucun souci concernant le code python
 
 # Ce qu'on aurait aimé améliorer
 
