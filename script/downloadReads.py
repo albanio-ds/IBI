@@ -13,7 +13,7 @@ def finder_ftp(fichierTsv):
     @paramètre: fichier tsv contenant les liens des échantillons à
     télécharger
 
-    @sortie: renvoye le numéro de la colonne contenant le champs
+    @sortie: renvoie le numéro de la colonne contenant le champ
     'fastq_ftp'. (entier)
     En cas d'erreur une exception est levée.
 
@@ -46,7 +46,7 @@ def finders_md5(fichierTsv):
     @paramètre: fichier tsv contenant les liens des échantillons à
     télécharger
 
-    @sortie: renvoye le numéro de la colonne contenant le champs
+    @sortie: renvoie le numéro de la colonne contenant le champ
     'fastq_md5'. (entier)
     En cas d'erreur une exception est levée.
 
@@ -72,18 +72,13 @@ def finders_md5(fichierTsv):
             raise Exception("pas de champs fastq_md5")
     return i
 
-
-
-
-
-
-
+#sample_alias finder  
 def finders_alias(fichierTsv):
     ''' 
     @paramètre: fichier tsv contenant les liens des échantillons à
     télécharger
 
-    @sortie: renvoye le numéro de la colonne contenant 
+    @sortie: renvoie le numéro de la colonne contenant 
     le champs'sample_alias'. (entier)
 
     En cas d'erreur une exception est levée.
@@ -115,7 +110,7 @@ def count_correct(fichierTsv):
     @paramètre: fichier tsv contenant les liens des échantillons à
     télécharger
 
-    @sortie: renvoye le nombre de lien à télécharger (entier)
+    @sortie: renvoie le nombre de liens à télécharger (entier)
 
     '''
 
@@ -138,7 +133,7 @@ def count_correct(fichierTsv):
 
 def telecharge(lien,md5_value):
     """
-    Cette fonction s'occupe du téléchargement des fichiers et garantie leurs origine à l'aide 
+    Cette fonction s'occupe du téléchargement des fichiers et garantie leur non-corruption à l'aide 
     des vérifications md5.
 
     @paramètre:  liengz , md5 associé au lien
@@ -146,8 +141,8 @@ def telecharge(lien,md5_value):
     @sortie: télécharge le lien gz demandé et verifie le md5   
 
     Fonctionnalité: 
-        -Si l'utilisateur décide d'arrêter le téléchargement par exemple si ça connexion est insuffisante
-        alors il peut faire ctrl+c 2 fois et seul le liens en cours de téléchargement est supprimé.
+        -Si l'utilisateur décide d'arrêter le téléchargement, par exemple si sa connexion est insuffisante,
+        alors il peut faire ctrl+c 2 fois et seul le lien en cours de téléchargement est supprimé.
 
 
 
@@ -190,19 +185,19 @@ Ouvrir prjeb_Dl.py
 
 Donner le nom du fichier "tsv" comme une chaine de caractère ex : pipeline_one("all.txt")
 
-Puis dans le Terminale : python3 prjeb_Dl.py
+Puis dans le terminal : python3 prjeb_Dl.py
 
-J'ai convertit le fichier tsv en une liste est je parcours seulements les éléments qui m'interessent à savoir les liens ftp et leurs  md5 !
+J'ai convertis le fichier tsv en une liste et je parcours seulement les éléments qui m'intéressent à savoir les liens ftp et leurs  md5 !
 
 
 Fonctionnalité: 
-On a pensé au confort utilisateur et lui permettre de télécharger les échantillons quand il le souhaite de plus 
-en cas de mauvaise connexion, ce  script est très pratique en effet un compteur et une vérification permet 
+On a pensé au confort utilisateur en lui permettant de télécharger les échantillons quand il le souhaite, en plusieurs fois, de plus 
+en cas de mauvaise connexion, ce  script est très pratique. En effet un compteur et une vérification permet 
 d'assurer qu'on ne télécharge pas le même fichier en cas de relance de script.
 
 Biblio:
 *os pour faire mes appels sys comme wget ou rm.
-*subprocess pour recupérer certains resultat d'appels sys , comme md5sum ou encore ls
+*subprocess pour récupérer certain resultat d'appels sys , comme md5sum ou encore ls
 
 
 
