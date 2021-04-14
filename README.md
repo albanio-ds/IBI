@@ -54,7 +54,8 @@ Dans le <b>mappingAndMore.py</b> :
 python3 downloadReads.py
 ```  
 En fonction de votre connexion, le téléchargement sera plus où moins long.
-* Pour lancer ce script le seul fichier nécessaire est le fichier .tsv
+* Fichier nécessaire :
+	- `tsv`
 * Vous pouvez annulez le téléchargement à tout moment en faisant ctrl+c, 2 fois.
 * Les fonctions sont directement commentées
 
