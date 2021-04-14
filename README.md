@@ -46,7 +46,7 @@ Dans le <b>mappingAndMore.py</b> :
 
 * le fichier TSV (fichier obligatoire)
 * le fichier contenant le genome de référence (fichier obligatoire)
-*  'java -jar le chemin vers le jar gatk-package-4.1.9.0-local.jar' (obligatoire)
+*  'java -jar le chemin vers le jar gatk-package-4.1.9.0-local.jar' (obligatoires)
 *  liste des positions de chromosomes (fichier obligatoire)
 *  exception : 2 fichiers R arbre.R et filtration.R contenant des valeurs brutes (obligatoire pour avoir les mêmes figures que nous)
 
@@ -60,16 +60,16 @@ En fonction de votre connexion, le téléchargement sera plus ou moins long.
 * Vous pouvez annuler le téléchargement à tout moment en faisant ctrl+c, 2 fois.
 * Les fonctions sont directement commentées
 
-# Concernant  mappingAndMore.py
+# Concernant mappingAndMore.py
 
  ```sh
 python3 mappingAndMore.py
 ```  
-Ce script nécessite une dizaine d'heures pour s'éxecuter.
+Ce script nécessite une dizaine d'heures pour s'exécuter.
 
 * Fichiers nécessaires : 
     - `tsv`
-   - `fichier contenant le genome de réference (généralement .fsa, .fasta)`
+   - `fichier contenant le génome de référence (généralement .fsa, .fasta)`
    -  `les .fastq (que vous avez obtenu en lançant downloadReads.py) `
     - `liste intervalle genomique `
     - `2 fichiers R :   `
@@ -87,8 +87,8 @@ Ce script nécessite une dizaine d'heures pour s'éxecuter.
 
 # Ce qu'on aurait aimé améliorer
 
-* Ajouter une interface interractive pour que la pipeline soit plus user-friendly.
+* Ajouter une interface interactive pour que le pipeline soit plus user-friendly.
 
-# remarque : 
+# Remarque : 
 
-* Pour avoir nos résutats vous pouvez lancer les commandes présentées au-dessus dans le répertoire  <b>ready</b> directement.
+* Pour avoir nos résultats vous pouvez lancer les commandes présentées au-dessus dans le répertoire <b>ready</b> directement.
