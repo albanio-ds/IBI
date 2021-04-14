@@ -69,17 +69,15 @@ Ce script nécessite  une dizaine d'heure pour s'éxecuter.
 * Fichier nécessaire : 
     - `tsv`
    - `fichier contenant le genome de réference (généralement .fsa, .fasta)`
-   -  `les .fastq (reads) `
+   -  `les .fastq (que vous avez obtenu en lançant downloadReads.py) `
     - `liste intervalle genomique `
     - `2 fichiers R :   `
     - ` un qui va servir pour visualiser les données à filtrées (QD,FS..) `
 	-  `un qui servira à faire notre arbre PCA` 
 
-* Tous ces fichiers doivent être dans le même répertoire (voir le répertoire <b>exemple</b>)
+* Tous ces fichiers doivent être dans le même répertoire (voir le répertoire <b>ready</b>)
  
 * Les fonctions sont directement commentées
-
-
 
 # Difficultés rencontré
 
@@ -89,3 +87,7 @@ Ce script nécessite  une dizaine d'heure pour s'éxecuter.
 # Ce qu'on aurait aimé améliorer
 
 * Ajouter une interface interractive pour que la pipeline soit plus user-friendly.
+
+# remarque : 
+
+* Pour avoir nos résutats vous pouvez lancer les commandes présentées au-dessus dans le répertoire  <b>ready</b> directement.
