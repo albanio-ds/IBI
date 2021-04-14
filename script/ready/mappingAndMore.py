@@ -835,8 +835,6 @@ def pipeline(fichierTsv, monGdeRef):
 genome_de_reference_fasta = newGenomeDeReference(genome_de_reference_fsa)
 pipeline(fichierTsv,genome_de_reference_fasta)
 
-#mappingCalcul()
-#couvertureMapp()
 #################
 
 
