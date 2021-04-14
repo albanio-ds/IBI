@@ -391,27 +391,34 @@ def  mappingCalcul():
     @sortie: (N/A)
 
     '''
-    affiche_ls = str(subprocess.check_output("ls" ,shell=True))
-    affiche_ls=affiche_ls.split("\\n")
-    pourcentage=[]
-    lemin =0
-    lemax=0
-    lamoyenne=0
-    for i in range(len(affiche_ls)-1):
-        fichier=affiche_ls[i].split("_")
-        if len(fichier)==2:
-            if fichier[1]=="flag.txt":
-                file_name ="_".join(fichier)
-                map_file = open(file_name)
-                map_file_toList =[ i.strip().split('\t') for i in map_file]
-                mapped_here= map_file_toList[4][0].split("%")
-                mapped_here = mapped_here[0].split("(")
-                pourcentage.append(float(mapped_here[1]))
+    if not checkNewFile("readMappentGeno.txt"):
+        affiche_ls = str(subprocess.check_output("ls" ,shell=True))
+        affiche_ls=affiche_ls.split("\\n")
+        pourcentage=[]
+        lemin =0
+        lemax=0
+        lamoyenne=0
+        allChaine = ""
+        for i in range(len(affiche_ls)-1):
+            fichier=affiche_ls[i].split("_")
+            if len(fichier)==2:
+                if fichier[1]=="flag.txt":
+                    file_name ="_".join(fichier)
+                    map_file = open(file_name)
+                    map_file_toList =[ i.strip().split('\t') for i in map_file]
+                    mapped_here= map_file_toList[4][0].split("%")
+                    mapped_here = mapped_here[0].split("(")
+                    pourcentage.append(float(mapped_here[1]))
 
-    lemin =min(pourcentage)
-    lemax=max(pourcentage)
-    lamoyenne=round(mean(pourcentage))
-    print("la moyenne =", lamoyenne  ,"le min = ", lemin , " le max = ", lemax )
+        lemin =min(pourcentage)
+        lemax=max(pourcentage)
+        lamoyenne=round(mean(pourcentage))
+        allChaine = "la moyenne =" + str(lamoyenne)  + " le min = " +  str(lemin)  + " le max = " + str(lemax)
+        os.system("echo "+ allChaine + " >  readMappentGeno.txt" )
+        print("la moyenne =", lamoyenne  ,"le min = ", lemin , " le max = ", lemax )
+    else:
+        print("Calcul des reads mappent le genome de référence  FAIT ! ")
+        return
 
 
 
@@ -426,33 +433,39 @@ def couvertureMapp():
 
 
     '''
-    affiche_ls = str(subprocess.check_output("ls" ,shell=True))
-    affiche_ls=affiche_ls.split("\\n")
-    moyTab=[]
-    lamoyenneToTal=0
-    leMin=0
-    leMax=0
-    for i in range(len(affiche_ls)-1):
-        fichier=affiche_ls[i].split("_")
-        if len(fichier)==2:
-            if fichier[1]=="couv.txt":
-                file_name ="_".join(fichier)
-                map_file = open(file_name)
-                fileToList = [ i.strip().split('\t') for i in map_file]
-                res=0
-                taille=0
-                for i in range(len(fileToList)):
-                    res+=int(fileToList[i][3])
-                    taille+=1
-                moy=res/taille
-                moyTab.append(moy)
+    if not checkNewFile("couvertureMoyenne.txt"):
+        affiche_ls = str(subprocess.check_output("ls" ,shell=True))
+        affiche_ls=affiche_ls.split("\\n")
+        moyTab=[]
+        lamoyenneToTal=0
+        leMin=0
+        leMax=0
+        lachaine = ""
+        for i in range(len(affiche_ls)-1):
+            fichier=affiche_ls[i].split("_")
+            if len(fichier)==2:
+                if fichier[1]=="couv.txt":
+                    file_name ="_".join(fichier)
+                    map_file = open(file_name)
+                    fileToList = [ i.strip().split('\t') for i in map_file]
+                    res=0
+                    taille=0
+                    for i in range(len(fileToList)):
+                        res+=int(fileToList[i][3])
+                        taille+=1
+                    moy=res/taille
+                    moyTab.append(moy)
 
 
-    leMin =min(moyTab)
-    leMax=max(moyTab)
-    lamoyenneToTal=round(mean(moyTab))
-    print("la moyenne =", lamoyenneToTal  ," le min = ", leMin , " le max = ", leMax )
-
+        leMin =min(moyTab)
+        leMax=max(moyTab)
+        lamoyenneToTal=round(mean(moyTab))
+        lachaine = "la moyenne =" + str(lamoyenneToTal)  +" le min = "+ str(leMin) + " le max = "+ str(leMax)
+        os.system("echo "+ lachaine + " > couvertureMoyenne.txt")
+        print("la moyenne =", lamoyenneToTal  ," le min = ", leMin , " le max = ", leMax )
+    else:
+        print("Calcul de la couverture moyenne  FAIT ! ")
+        return
 
 
 
@@ -807,6 +820,8 @@ def pipeline(fichierTsv, monGdeRef):
     if count_correct(fichierTsv) == compteur : 
         print("mapping fini ! ")
         doneOrNotMapping=True
+        mappingCalcul()
+        #couvertureMapp()   # long a tourner
 
  
     if doneOrNotMapping and  gatkGenomic() and  gatkGenotype(monGdeRef) and  gatkVariant_and_filter_Finding(monGdeRef)   and applyFiltration(monGdeRef):
