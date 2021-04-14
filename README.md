@@ -39,20 +39,23 @@ Option: Projet intégré de bioinformatique
 * Remplacer les champs marqué avec '<b>a changer </b>' c'est à dire :
 
 Dans le <b>downloadReads.py</b> : 
-* le fichier TSV.
+* le fichier TSV. (fichier obligatoire)
 
 Dans le <b>mappingAndMore.py</b> : 
 
-* le fichier TSV 
-* le fichier contenant le genome de référence 
-*  'java -jar le chemin vers le jar gatk-package-4.1.9.0-local.jar'
+* le fichier TSV (fichier obligatoire)
+* le fichier contenant le genome de référence (fichier obligatoire)
+*  'java -jar le chemin vers le jar gatk-package-4.1.9.0-local.jar' (obligatoire)
+*  liste des positions de chromosomes (fichier obligatoire)
+*  exception : 2 fichiers R arbre.R et filtration.R contenant des valeurs brutes (obligatoire pour avoir les mêmes figures que nous)
 
 # Concernant downloadReads.py
  ```sh
 python3 downloadReads.py
 ```  
 En fonction de votre connexion, le téléchargement sera plus où moins long.
-* Pour lancer ce script le seul fichier nécessaire est le fichier .tsv
+* Fichier nécessaire :
+	- `tsv`
 * Vous pouvez annulez le téléchargement à tout moment en faisant ctrl+c, 2 fois.
 * Les fonctions sont directement commentées
 
@@ -64,11 +67,11 @@ python3 mappingAndMore.py
 Ce script nécessite  une dizaine d'heure pour s'éxecuter.
 
 * Fichier nécessaire : 
-    - `-tsv`
-   - `-fichier contenant le genome de réference (généralement .fsa, .fasta)`
-   -  `-les .fastq (reads) `
-    - `-liste intervalle genomique `
-    - `-2 fichiers R :   `
+    - `tsv`
+   - `fichier contenant le genome de réference (généralement .fsa, .fasta)`
+   -  `les .fastq (reads) `
+    - `liste intervalle genomique `
+    - `2 fichiers R :   `
     - ` un qui va servir pour visualiser les données à filtrées (QD,FS..) `
 	-  `un qui servira à faire notre arbre PCA` 
 
